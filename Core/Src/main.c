@@ -21,7 +21,9 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <string.h>
+#include "stm32l0xx_hal.h"
+#include <lcd_hd44780.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -43,6 +45,13 @@
 TIM_HandleTypeDef htim2;
 
 /* USER CODE BEGIN PV */
+int lewy,prawy,srodek;
+uint32_t duty = 1400;
+int searchDir = 0;
+#define DUTY_FAST  1400
+#define DUTY_SLOW   1150
+#define DUTY_STOP     0
+uint32_t bitSkretu = -1;
 
 /* USER CODE END PV */
 
@@ -51,6 +60,90 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_TIM2_Init(void);
 /* USER CODE BEGIN PFP */
+void dzidaDoPrzodu(void){
+	HAL_GPIO_WritePin(GPIOC, IN1_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOC, IN2_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOC, IN3_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOC, IN4_Pin, GPIO_PIN_RESET);
+	__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, duty);
+	__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, duty);
+}
+
+void powoli(void){
+	HAL_GPIO_WritePin(GPIOC, IN1_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOC, IN2_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOC, IN3_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOC, IN4_Pin, GPIO_PIN_RESET);
+	__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, duty);
+	__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, duty);
+}
+
+void skretWLewo(void){
+	HAL_GPIO_WritePin(GPIOC, IN1_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOC, IN2_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOC, IN3_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOC, IN4_Pin, GPIO_PIN_RESET);
+	__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, duty);
+	__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
+}
+
+void skretWPrawo(void){
+	 HAL_GPIO_WritePin(GPIOC, IN1_Pin, GPIO_PIN_RESET);
+	 HAL_GPIO_WritePin(GPIOC, IN2_Pin, GPIO_PIN_RESET);
+	 HAL_GPIO_WritePin(GPIOC, IN3_Pin, GPIO_PIN_SET);
+	 HAL_GPIO_WritePin(GPIOC, IN4_Pin, GPIO_PIN_RESET);
+	 __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 0);
+	 __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, duty);
+}
+
+void stop(void){
+	HAL_GPIO_WritePin(GPIOC, IN1_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOC, IN2_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOC, IN3_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOC, IN4_Pin, GPIO_PIN_RESET);
+	__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, duty);
+	__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, duty);
+}
+
+void lewy90(void){
+    HAL_GPIO_WritePin(GPIOC, IN1_Pin, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOC, IN2_Pin, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(GPIOC, IN3_Pin, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(GPIOC, IN4_Pin, GPIO_PIN_RESET);
+    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, duty);
+    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, duty);
+    HAL_Delay(300);
+}
+
+void prawy90(void){
+    HAL_GPIO_WritePin(GPIOC, IN1_Pin, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(GPIOC, IN2_Pin, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOC, IN3_Pin, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOC, IN4_Pin, GPIO_PIN_SET);
+    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, duty);
+    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, duty);
+    HAL_Delay(300);
+}
+
+void searchLine(uint32_t bitSkretu){
+	if(bitSkretu==-1){
+    	HAL_GPIO_WritePin(GPIOC, IN1_Pin, GPIO_PIN_RESET);
+    	HAL_GPIO_WritePin(GPIOC, IN2_Pin, GPIO_PIN_SET);
+    	HAL_GPIO_WritePin(GPIOC, IN3_Pin, GPIO_PIN_SET);
+    	HAL_GPIO_WritePin(GPIOC, IN4_Pin, GPIO_PIN_RESET);
+    	__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, duty);
+    	__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, duty);
+	}
+	else{
+		HAL_GPIO_WritePin(GPIOC, IN1_Pin, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(GPIOC, IN2_Pin, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(GPIOC, IN3_Pin, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(GPIOC, IN4_Pin, GPIO_PIN_SET);
+		__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, duty);
+		__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, duty);
+	}
+}
+
 
 /* USER CODE END PFP */
 
@@ -90,138 +183,73 @@ int main(void)
   MX_GPIO_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
+  LCD_Init();
+  LCD_SetCursor(0, 0);
+  LCD_SendString("STM32 + LCD");
+  LCD_SetCursor(1, 0);
+  LCD_SendString("Dziala!");
 
+  HAL_GPIO_TogglePin(GPIOA, LED_Pin);
+
+  while(HAL_GPIO_ReadPin(GPIOC, B1_Pin) == GPIO_PIN_SET)
+  	  {
+  	    HAL_Delay(200);
+  	  }
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  	  HAL_GPIO_WritePin(GPIOC, IN1_Pin, GPIO_PIN_RESET);
+  	  HAL_GPIO_WritePin(GPIOC, IN2_Pin, GPIO_PIN_RESET);
+  	  HAL_GPIO_WritePin(GPIOC, IN3_Pin, GPIO_PIN_RESET);
+  	  HAL_GPIO_WritePin(GPIOC, IN4_Pin, GPIO_PIN_RESET);
+
+  	  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
+  	  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
+
+  	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 0);
+  	  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
   while (1)
   {
+	  lewy   = HAL_GPIO_ReadPin(IR1_GPIO_Port, IR1_Pin);
+	      srodek = HAL_GPIO_ReadPin(IR2_GPIO_Port, IR2_Pin);
+	      prawy  = HAL_GPIO_ReadPin(IR3_GPIO_Port, IR3_Pin);
 
-	  while(HAL_GPIO_ReadPin(GPIOC, B1_Pin) == GPIO_PIN_SET)
-	  	    	   {
-	  	    	     HAL_GPIO_TogglePin(GPIOA, LED_Pin); // miga diodą LED na PA5
-	  	    	     HAL_Delay(200);
-	  	    	   }
+	      if (lewy && srodek && prawy) {
+	          duty = DUTY_SLOW;
+	          powoli(); //stop
+	      }
+	      else if (lewy && srodek && !prawy) {
+	          duty = DUTY_SLOW;
+	          skretWLewo();
+	          bitSkretu=1;
+	      }
+	      else if (prawy && srodek && !lewy) {
+	          duty = DUTY_SLOW;
+	          skretWPrawo();
+	          bitSkretu=-1;
+	      }
+	      else if (srodek && !lewy && !prawy) {
+	          duty = DUTY_FAST;
+	          dzidaDoPrzodu();
+	      }
+	      else if (lewy && !srodek && !prawy) {
+	          duty = DUTY_SLOW;
+	          skretWLewo();
+	          bitSkretu=1;
+	      }
+	      else if (prawy && !srodek && !lewy) {
+	          duty = DUTY_SLOW;
+	          skretWPrawo();
+	          bitSkretu=-1;
+	      }
+	      else {
+	          duty = DUTY_SLOW;
+	          searchLine(bitSkretu);
+	      }
 
-	  	  	  	  	HAL_GPIO_WritePin(GPIOC, IN1_Pin, GPIO_PIN_RESET);
-	  	  	    	HAL_GPIO_WritePin(GPIOC, IN2_Pin, GPIO_PIN_RESET);
-	                  HAL_GPIO_WritePin(GPIOC, IN3_Pin, GPIO_PIN_RESET);
-	  	  	    	HAL_GPIO_WritePin(GPIOC, IN4_Pin, GPIO_PIN_RESET);
-
-	  	    	  	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
-	  	    	    HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
-
-	  	    	    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 0);
-	  	    	    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
-
-
-	  	    	    HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
-
-	  	    	    uint32_t duty = 1200; // PWM
-	  	    	    for (int i = 0; i < 10; ++i)
-	  	    	    {
-	  	    	      switch(i)
-	  	    	      {
-	  	    	        case 0: // Jedź do przodu
-	                         HAL_GPIO_WritePin(GPIOC, IN1_Pin, GPIO_PIN_SET);
-	                         HAL_GPIO_WritePin(GPIOC, IN2_Pin, GPIO_PIN_RESET);
-	                         HAL_GPIO_WritePin(GPIOC, IN3_Pin, GPIO_PIN_SET);
-	                         HAL_GPIO_WritePin(GPIOC, IN4_Pin, GPIO_PIN_RESET);
-	  	    	          __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, duty);
-	  	    	          __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, duty);
-	  	    	          HAL_Delay(2500); // Czas trwania sekwencji
-	  	    	          break;
-	  	    	        case 1: // Jedź do tyłuA
-	                         HAL_GPIO_WritePin(GPIOC, IN1_Pin, GPIO_PIN_RESET);
-	                         HAL_GPIO_WritePin(GPIOC, IN2_Pin, GPIO_PIN_SET);
-	                         HAL_GPIO_WritePin(GPIOC, IN3_Pin, GPIO_PIN_RESET);
-	                         HAL_GPIO_WritePin(GPIOC, IN4_Pin, GPIO_PIN_SET);
-	  	    	          __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, duty);
-	  	    	          __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, duty);
-	  	    	          HAL_Delay(2500); // Czas trwania sekwencji
-	  	    	          break;
-	  	    	        case 2: // Skręt w lewo
-	                        HAL_GPIO_WritePin(GPIOC, IN1_Pin, GPIO_PIN_RESET);
-	  	  	    	      HAL_GPIO_WritePin(GPIOC, IN2_Pin, GPIO_PIN_SET);
-	                        HAL_GPIO_WritePin(GPIOC, IN3_Pin, GPIO_PIN_RESET);
-	  	  	    	      HAL_GPIO_WritePin(GPIOC, IN4_Pin, GPIO_PIN_RESET);
-	  	    	          __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 0);
-	  	    	          __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, duty);
-	  	    	          HAL_Delay(1000); // Czas trwania sekwencji
-	  	    	          break;
-	  	    	        case 3: // Skręt w prawo
-	                        HAL_GPIO_WritePin(GPIOC, IN1_Pin, GPIO_PIN_SET);
-	  	  	    	      HAL_GPIO_WritePin(GPIOC, IN2_Pin, GPIO_PIN_RESET);
-	                        HAL_GPIO_WritePin(GPIOC, IN3_Pin, GPIO_PIN_RESET);
-	  	  	    	      HAL_GPIO_WritePin(GPIOC, IN4_Pin, GPIO_PIN_RESET);
-	  	    	          __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, duty);
-	  	    	          __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
-	  	    	          HAL_Delay(1000); // Czas trwania sekwencji
-	  	    	          break;
-	  	    	        case 4: // Zatrzymaj się HARD STOP
-	  	    	          HAL_GPIO_WritePin(GPIOC, IN1_Pin, GPIO_PIN_RESET);
-	  	  	    	      HAL_GPIO_WritePin(GPIOC, IN2_Pin, GPIO_PIN_RESET);
-	                        HAL_GPIO_WritePin(GPIOC, IN3_Pin, GPIO_PIN_RESET);
-	  	  	    	      HAL_GPIO_WritePin(GPIOC, IN4_Pin, GPIO_PIN_RESET);
-	                        __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, duty);
-	  	    	          __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, duty);
-
-	  	    	          HAL_Delay(3000); // Czas trwania sekwencji
-	  	    	          break;
-	  	    	        case 5: // Lewy silnik do przodu, prawy do tyłu – obrót w miejscu (lewo)
-	                        HAL_GPIO_WritePin(GPIOC, IN1_Pin, GPIO_PIN_SET);
-	  	  	    	      HAL_GPIO_WritePin(GPIOC, IN2_Pin, GPIO_PIN_RESET);
-	                        HAL_GPIO_WritePin(GPIOC, IN3_Pin, GPIO_PIN_RESET);
-	  	  	    	      HAL_GPIO_WritePin(GPIOC, IN4_Pin, GPIO_PIN_SET);
-	  	    	          __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, duty);
-	  	    	          __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, duty);
-	  	    	          HAL_Delay(2500); // Czas trwania sekwencji
-	  	    	          break;
-	  	    	        case 6: // Lewy silnik do tyłu, prawy do przodu – obrót w miejscu (prawo)
-	                        HAL_GPIO_WritePin(GPIOC, IN1_Pin, GPIO_PIN_RESET);
-	  	  	    	      HAL_GPIO_WritePin(GPIOC, IN2_Pin, GPIO_PIN_SET);
-	                        HAL_GPIO_WritePin(GPIOC, IN3_Pin, GPIO_PIN_SET);
-	  	  	    	      HAL_GPIO_WritePin(GPIOC, IN4_Pin, GPIO_PIN_RESET);
-	  	    	          __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, duty);
-	  	    	          __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, duty);
-	  	    	          HAL_Delay(2500); // Czas trwania sekwencji
-	  	    	          break;
-	  	    	        case 7: // Jedź do przodu wolniej
-	                         HAL_GPIO_WritePin(GPIOC, IN1_Pin, GPIO_PIN_SET);
-	                         HAL_GPIO_WritePin(GPIOC, IN2_Pin, GPIO_PIN_RESET);
-	                         HAL_GPIO_WritePin(GPIOC, IN3_Pin, GPIO_PIN_SET);
-	                         HAL_GPIO_WritePin(GPIOC, IN4_Pin, GPIO_PIN_RESET);
-	  	    	          __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, duty / 2);
-	  	    	          __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, duty / 2);
-	  	    	          HAL_Delay(4000); // Czas trwania sekwencji
-	  	    	          break;
-	  	    	        case 8: // Jedź do przodu szybciej
-	                         HAL_GPIO_WritePin(GPIOC, IN1_Pin, GPIO_PIN_SET);
-	                         HAL_GPIO_WritePin(GPIOC, IN2_Pin, GPIO_PIN_RESET);
-	                         HAL_GPIO_WritePin(GPIOC, IN3_Pin, GPIO_PIN_SET);
-	                         HAL_GPIO_WritePin(GPIOC, IN4_Pin, GPIO_PIN_RESET);
-	  	    	          __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, duty*1.20);
-	  	    	          __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, duty*1.20);
-	  	    	          HAL_Delay(1000); // Czas trwania sekwencji
-	  	    	          break;
-	  	    	        case 9: // Zatrzymaj się SOFT STOP z mrugnięciem LED
-	                         HAL_GPIO_WritePin(GPIOC, IN1_Pin, GPIO_PIN_SET);
-	  	  	    	       HAL_GPIO_WritePin(GPIOC, IN2_Pin, GPIO_PIN_SET);
-	                         HAL_GPIO_WritePin(GPIOC, IN3_Pin, GPIO_PIN_SET);
-	  	  	    	       HAL_GPIO_WritePin(GPIOC, IN4_Pin, GPIO_PIN_SET);
-	  	    	          __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 0);
-	  	    	          __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
-	  	    	          HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
-	  	    	          HAL_Delay(200);
-	  	    	          HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
-	  	    	          break;
-	  	    	      }
-
-
-	  	    	    }
-
+	      HAL_Delay(100);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -291,7 +319,7 @@ static void MX_TIM2_Init(void)
   htim2.Instance = TIM2;
   htim2.Init.Prescaler = 0;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 1600;
+  htim2.Init.Period = 1599;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
@@ -347,12 +375,18 @@ static void MX_GPIO_Init(void)
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC, D0_Pin|D1_Pin|D2_Pin|D3_Pin
+                          |IN4_Pin|IN3_Pin|IN1_Pin|IN2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, IN4_Pin|IN3_Pin|IN1_Pin|IN2_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, LED_Pin|D4_Pin|D5_Pin|D6_Pin
+                          |D7_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, E_Pin|RS_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : B1_Pin */
   GPIO_InitStruct.Pin = B1_Pin;
@@ -360,22 +394,61 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : LED_Pin */
-  GPIO_InitStruct.Pin = LED_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(LED_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : IN4_Pin IN3_Pin IN1_Pin IN2_Pin */
-  GPIO_InitStruct.Pin = IN4_Pin|IN3_Pin|IN1_Pin|IN2_Pin;
+  /*Configure GPIO pins : D0_Pin D1_Pin D2_Pin D3_Pin
+                           IN4_Pin IN3_Pin IN1_Pin IN2_Pin */
+  GPIO_InitStruct.Pin = D0_Pin|D1_Pin|D2_Pin|D3_Pin
+                          |IN4_Pin|IN3_Pin|IN1_Pin|IN2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /* USER CODE BEGIN MX_GPIO_Init_2 */
+  /*Configure GPIO pins : LED_Pin D4_Pin D5_Pin D6_Pin
+                           D7_Pin */
+  GPIO_InitStruct.Pin = LED_Pin|D4_Pin|D5_Pin|D6_Pin
+                          |D7_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
+  /*Configure GPIO pins : E_Pin RS_Pin */
+  GPIO_InitStruct.Pin = E_Pin|RS_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : IR1_Pin IR3_Pin IR2_Pin */
+  GPIO_InitStruct.Pin = IR1_Pin|IR3_Pin|IR2_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /* USER CODE BEGIN MX_GPIO_Init_2 */
+  // Włącz taktowanie GPIOB i GPIOC
+  /*
+  RCC->AHBENR |= RCC_IOPENR_GPIOBEN | RCC_IOPENR_GPIOBEN;
+
+  // Konfiguracja PB10 (E) i PB11 (RS)
+  GPIOB->MODER &= ~(0b11 << (10 * 2)); // wyczyść PB10
+  GPIOB->MODER |=  (0b01 << (10 * 2)); // output
+  GPIOB->MODER &= ~(0b11 << (11 * 2));
+  GPIOB->MODER |=  (0b01 << (11 * 2));
+
+  GPIOB->OTYPER &= ~((1 << 10) | (1 << 11));
+  GPIOB->OSPEEDR |= (0b11 << (10 * 2)) | (0b11 << (11 * 2));
+  GPIOB->PUPDR &= ~((0b11 << (10 * 2)) | (0b11 << (11 * 2)));
+
+  // Konfiguracja PC0–PC3 (D4–D7)
+  for (int i = 0; i <= 3; ++i) {
+      GPIOC->MODER &= ~(0b11 << (i * 2));
+      GPIOC->MODER |=  (0b01 << (i * 2));
+      GPIOC->OTYPER &= ~(1 << i);
+      GPIOC->OSPEEDR |= (0b11 << (i * 2));
+      GPIOC->PUPDR &= ~(0b11 << (i * 2));
+  }
+*/
   /* USER CODE END MX_GPIO_Init_2 */
 }
 
