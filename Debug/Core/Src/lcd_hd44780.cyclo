@@ -1,0 +1,9 @@
+../Core/Src/lcd_hd44780.c:5:13:LCD_EnablePulse	1
+../Core/Src/lcd_hd44780.c:12:13:LCD_Write8Bits	1
+../Core/Src/lcd_hd44780.c:24:13:LCD_Send	1
+../Core/Src/lcd_hd44780.c:29:6:LCD_SendCommand	1
+../Core/Src/lcd_hd44780.c:33:6:LCD_SendData	1
+../Core/Src/lcd_hd44780.c:37:6:LCD_Clear	1
+../Core/Src/lcd_hd44780.c:42:6:LCD_SetCursor	2
+../Core/Src/lcd_hd44780.c:47:6:LCD_SendString	2
+../Core/Src/lcd_hd44780.c:53:6:LCD_Init	1
