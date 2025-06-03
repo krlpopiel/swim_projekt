@@ -285,7 +285,7 @@ void searchLine(int lastTurnDirection)
 {
     uint32_t search_duty = DUTY_SLOW;
 
-    if (lastTurnDirection >= 0)
+    if (lastTurnDirection <= 0)
     {
         HAL_GPIO_WritePin(GPIOC, IN1_Pin, GPIO_PIN_SET);
         HAL_GPIO_WritePin(GPIOC, IN2_Pin, GPIO_PIN_RESET);
@@ -433,6 +433,12 @@ int main(void)
   MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
     LCD_Init();
+    LCD_DrawFace(1);
+    HAL_Delay(1000);
+    LCD_DrawFace(0);
+    HAL_Delay(1000);
+    LCD_DrawFace(2);
+    HAL_Delay(1000);
     LCD_DrawFace(1);
     play_melody(happy_bounce);
     lcd_initialized = true;
@@ -706,61 +712,44 @@ int main(void)
         }
         else
         {
-            lewy = HAL_GPIO_ReadPin(IR1_GPIO_Port, IR1_Pin);
-            srodek = HAL_GPIO_ReadPin(IR2_GPIO_Port, IR2_Pin);
-            prawy = HAL_GPIO_ReadPin(IR3_GPIO_Port, IR3_Pin);
+        			lewy   = HAL_GPIO_ReadPin(IR1_GPIO_Port, IR1_Pin);
+        		      srodek = HAL_GPIO_ReadPin(IR2_GPIO_Port, IR2_Pin);
+        		      prawy  = HAL_GPIO_ReadPin(IR3_GPIO_Port, IR3_Pin);
 
-            if (lewy && srodek && prawy)
-            {
-                searchLine(bitSkretu);
-            }
-            else if (!lewy && !srodek && !prawy)
-            {
-                duty = DUTY_SLOW;
-                dzidaDoPrzodu();
-                bitSkretu = 0;
-                LCD_DrawFace(1);
-            }
-            else if (lewy && !srodek && prawy)
-            {
-                duty = DUTY_FAST;
-                dzidaDoPrzodu();
-                bitSkretu = 0;
-                LCD_DrawFace(1);
-            }
-            else if (!lewy && !srodek && prawy)
-            {
-                duty = DUTY_SLOW;
-                skretWLewo();
-                bitSkretu = 1;
-                LCD_DrawFace(0);
-            }
-            else if (lewy && !srodek && !prawy)
-            {
-                duty = DUTY_SLOW;
-                skretWPrawo();
-                bitSkretu = -1;
-                LCD_DrawFace(2);
-            }
-            else if (!lewy && srodek && prawy)
-            {
-                duty = DUTY_SLOW;
-                skretWLewo();
-                bitSkretu = 1;
-                LCD_DrawFace(0);
-            }
-            else if (lewy && srodek && !prawy)
-            {
-                duty = DUTY_SLOW;
-                skretWPrawo();
-                bitSkretu = -1;
-                LCD_DrawFace(2);
-            }
-            else
-            {
-                searchLine(bitSkretu);
-            }
-            HAL_Delay(50);
+        		      if (lewy && srodek && prawy) {
+        		          duty = DUTY_SLOW;
+        		          dzidaDoPrzodu();
+        		      }
+        		      else if (lewy && srodek && !prawy) {
+        		          duty = DUTY_SLOW;
+        		          skretWLewo();
+        		          bitSkretu=1;
+        		      }
+        		      else if (prawy && srodek && !lewy) {
+        		          duty = DUTY_SLOW;
+        		          skretWPrawo();
+        		          bitSkretu=-1;
+        		      }
+        		      else if (srodek && !lewy && !prawy) {
+        		          duty = DUTY_SLOW;
+        		          dzidaDoPrzodu();
+        		      }
+        		      else if (lewy && !srodek && !prawy) {
+        		          duty = DUTY_SLOW;
+        		          skretWLewo();
+        		          bitSkretu=1;
+        		      }
+        		      else if (prawy && !srodek && !lewy) {
+        		          duty = DUTY_SLOW;
+        		          skretWPrawo();
+        		          bitSkretu=-1;
+        		      }
+        		      else {
+        		          duty = DUTY_SLOW;
+        		          searchLine(bitSkretu);
+        		      }
+
+        		      HAL_Delay(50);
         }
     /* USER CODE END WHILE */
 
