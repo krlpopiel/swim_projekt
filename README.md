@@ -45,17 +45,6 @@ Trzy branch'e pokazujące postępy w tworzeniu projektu, wraz z nową zawartośc
 
 ---
 
-## 🔌 Komendy UART
-
-| Komenda         | Opis                               |
-|-----------------|------------------------------------|
-| `dzidaDoPrzodu` | Uruchamia pojazd - jazda do przodu |
-| `stop`          | Zatrzymuje pojazd                  |
-| `skretWLewo`    | Skręt w lewo                       |
-| `skretWPrawo`   | Skręt w prawo                      |
-
----
-
 ## 🧪 Scenariusze testowe
 
 - [x] Reakcja na białą/czarną linię (IR)
