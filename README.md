@@ -1,98 +1,106 @@
-# 🚗 Pojazd zbudowany z wykorzystaniem STM32
+# 🚗 STM32-Based Vehicle
 
-Projekt semestralny z przedmiotu **Systemy Wbudowane i Mikrokontrolery**  
-Autorzy: Adrian Popielarczyk, Zuzanna Orzechowska   
-Numery indeksu: 21295, 21284 
-Data rozpoczęcia: 3 maja 2025
-Repozytorium zawiera kod, dokumentację oraz materiały projektowe.
+Semester project for **Embedded Systems and Microcontrollers** Authors: Adrian Popielarczyk, Zuzanna Orzechowska
 
----
+Student IDs: 21295, 21284
 
-## 📌 Opis projektu
+Start date: May 3, 2025
 
-Robot potrafi poruszać się w dwóch trybach – automatycznym (porusza się po dowolnym czarnym śladzie na białym tle - linii) oraz manualnym (ruch sterowany jest za pomocą pilota oraz modułu podczerwieni). Robot posiada ekran LCD, potrafiący wyświetlać napisy oraz buzie – jej wyraz zmienia się wraz z kierunkiem jazdy w trybie automatycznym. Realizuje on te zadania za pomocą zewnętrznych przycisków. Robot posiada 1 parę osi. Oś nie jest skrętna, a przyczepność oraz napęd występują na tylnej osi. Skręt przypomina schemat poruszania się pojazdami pełzającymi jak czołg, z tą różnicą, że zamiast gąsienic mamy do czynienia z kołami. Robot posiada jedno źródło zasilania – do silników, oraz do płytki STM 32 – 6 baterii 1.6V. Podczas inicjalizacji programu, czyli uruchomieniu robota ogrywana jest skoczna melodyjka przez brzęczyk pasywny.
+The repository contains code, documentation, and project materials.
 
 ---
 
-## 🛠️ Zastosowane technologie i narzędzia
+## 📌 Project Description
 
-- **Mikrokontroler:** STM32 NUCLEO F411RE
-- **IDE:** STM32CubeIDE
-- **Programowanie:** C (HAL / LL)
-- **Sensory:**
-  - Sensor podczerwieni IR 38 kHz
-  - Sensory optyczne (IR) TCRT5000
-- **Zasilanie:**  Bateria 1.6V x6
-- **Sterownik silników:** L298n
-- **Komunikacja:** UART (moduł podczerwieni)
+The robot can move in two modes – **automatic** (follows any black trace on a white background - line follower) and **manual** (movement is controlled via a remote control and an infrared module). The robot features an LCD screen capable of displaying text and faces – its expression changes along with the driving direction in automatic mode. It performs these tasks using external buttons.
+
+The robot has one pair of axles. The axle is not steerable (fixed), and traction/drive is applied to the rear axle. Steering resembles the movement scheme of crawler vehicles like a tank (skid-steering), with the difference that wheels are used instead of tracks. The robot has a single power source – for both the motors and the STM32 board – consisting of six 1.6V batteries. During program initialization (robot startup), a lively melody is played via a passive buzzer.
 
 ---
 
-## ⚙️ Funkcjonalności
+## 🛠️ Technologies and Tools
 
-- ✅ Napęd sterowany przez PWM z użyciem Timerów
-- ✅ Obsługa sensorów ultradźwiękowych (pomiar odległości)
-- ✅ Odczyt wartości z sensorów IR (linia / przeszkody) przy użyciu ADC
-- ✅ Odgrywanie melodyjki podczas inicjacji programu
-- ✅ Sterowanie ruchem przez UART (pilot z modułem podczerwieni)
-- ✅ Zasilanie bateryjne – pełna autonomia
-- ✅ Wyświetlacz LCD pokazujący wyraz twarzy - nos i oczy
+* **Microcontroller:** STM32 NUCLEO F411RE
+* **IDE:** STM32CubeIDE
+* **Programming:** C (HAL / LL)
+* **Sensors:**
+* IR Receiver Sensor 38 kHz
+* Optical Sensors (IR) TCRT5000
 
----
 
-## 📁 Struktura repozytorium
-Trzy branch'e pokazujące postępy w tworzeniu projektu, wraz z nową zawartością kodu tworzono nowy realase - z paczką zip, obecnie najnowszy to release v3.1 - gotowa funkcjonalność jazdy manualnej i automatycznej, odgrywanie melodyjki oraz wyświetlacz LCD
-
----
-
-## 🧪 Scenariusze testowe
-
-- [x] Reakcja na białą/czarną linię (IR)
-- [x] Komunikacja przez moduł podczerwieni
-- [x] Test zasilania bateryjnego
-- [x] Sterowanie ruchem w czasie rzeczywistym
+* **Power Supply:** 6x 1.6V Batteries
+* **Motor Driver:** L298n
+* **Communication:** UART (Infrared module)
 
 ---
 
-## 📸 Demo i zdjęcia
+## ⚙️ Functionalities
 
-- Zdjęcia pojazdu jak i nagrania znajdują się w folderze:
-https://mega.nz/fm/jtxTxCZR
-
----
-
-## 📄 Dokumentacja
-
-Pełna dokumentacja projektu znajduje się w folderze:
-https://mega.nz/fm/jtxTxCZR
-w tym:
-- Raport końcowy (PDF)
-- Raporty do milestonów
+* ✅ PWM-controlled drive using Timers
+* ✅ Ultrasonic sensor support (distance measurement)
+* ✅ Reading IR sensor values (line/obstacles) using ADC
+* ✅ Melody playback during program initialization
+* ✅ Movement control via UART (Remote with IR module)
+* ✅ Battery powered – full autonomy
+* ✅ LCD display showing facial expressions - nose and eyes
 
 ---
 
-## 📅 Harmonogram pracy
+## 📁 Repository Structure
 
-- 03.05 - 13.05: zaprojektowanie podstawowych sekwencji, budowa robota, raport z budowy,  projekt 3D robota, inżynieria
-mechaniczna
-- 14.05 - 27.05:  programowanie sekwencji dodatkowych, programowanie sekwencji podstawowej,raport z budowy 
-- 28.05 - 03.06: dodanie dodatkowych funkcjonalności - brzęczyk pasywny i wyświetlacz LCD
-- 10.06: finalna prezentacja robota
+Three branches showing project progress. New releases were created along with new code content (containing a zip package). Currently, the latest is **release v3.1** – complete manual and automatic driving functionality, melody playback, and LCD display.
 
 ---
 
-## 🧠 Wnioski
+## 🧪 Test Scenarios
 
-Robot bez zarzutu pokonuje trase po linii oraz może być sprawnie obsługiwany przez pilot z modułem podczerwieni. Dodatkowo sukcesem okazało sie dodanie wyświetlacza LCD, który ukazuje odpowiednią buzię wraz z kierunkiem jazdy robota w trybie automatycznym. Brzęczyk pasywny sygnalizuje, że cały program działa i robot odpowiednia inicjalizuje program i rozpoczyna jazde.
-
----
-
-## 📬 Kontakt
-
-W razie pytań:
-- Email: 21295@student.ans-elblag.pl, 21284@student.ans-elblag.pl
-- GitHub: krlpopiel, zuzanna-orzechowska
+* [x] Reaction to white/black line (IR)
+* [x] Communication via infrared module
+* [x] Battery power test
+* [x] Real-time movement control
 
 ---
 
-**Licencja:** MIT  
+## 📸 Demo and Photos
+
+* Photos of the vehicle as well as recordings are located in the folder:
+[https://mega.nz/fm/jtxTxCZR](https://mega.nz/fm/jtxTxCZR)
+
+---
+
+## 📄 Documentation
+
+Full project documentation is located in the folder:
+[https://mega.nz/fm/jtxTxCZR](https://mega.nz/fm/jtxTxCZR)
+including:
+
+* Final Report (PDF)
+* Milestone Reports
+
+---
+
+## 📅 Work Schedule
+
+* **May 03 - May 13:** designing basic sequences, robot assembly, construction report, 3D robot project, mechanical engineering
+* **May 14 - May 27:** programming additional sequences, programming basic sequence, construction report
+* **May 28 - June 03:** adding additional functionalities - passive buzzer and LCD display
+* **June 10:** final presentation of the robot
+
+---
+
+## 🧠 Conclusions
+
+The robot flawlessly traverses the route along the line and can be efficiently operated via the remote control with the infrared module. Additionally, adding the LCD display, which shows the appropriate face corresponding to the robot's driving direction in automatic mode, proved to be a success. The passive buzzer signals that the entire program is working, and the robot properly initializes the program and begins driving.
+
+---
+
+## 📬 Contact
+
+If you have any questions:
+
+* Email: 21295@student.ans-elblag.pl, 21284@student.ans-elblag.pl
+* GitHub: krlpopiel, zuzanna-orzechowska
+
+---
+
+**License:** MIT
